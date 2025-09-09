@@ -87,9 +87,12 @@ def AngleBetweenRadians(a: np.ndarray, b: np.ndarray) -> float:
     mag_a = np.linalg.norm(a)
     mag_b = np.linalg.norm(b)
 
-    if(mag_a * mag_b == 0)
+    if(mag_a * mag_b == 0):
         raise ValueError("One or more vectors ")
 
     cosine = np.clip(dot / (mag_a * mag_b), -1, 1)
 
     return np.arccos(cosine)
+
+def GetHeadingAngleDegrees(heading: np.ndarray) -> float:
+    return AngleBetweenRadians(heading, NORTH) * DEGREES_PER_RADIAN
