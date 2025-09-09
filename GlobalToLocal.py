@@ -11,6 +11,10 @@ NORTH = np.array([0, 0, 1]) #z
 DEGREES_PER_RADIAN = 180 / np.pi
 RADIANS_PER_DEGREE = np.pi / 180
 
+# Converts a right ascension given in hours, minutes, and seconds purely to seconds.
+def RASeconds(hours: float, minutes: float, seconds: float) -> float:
+    return hours * 60 * 60 + minutes * 60 + seconds
+
 # Given a right ascension provided in seconds, returns an angle from the up vector in the up-east plane
 # Do not need to convert declination to degrees - it's in degrees.
 def RAToTheta(seconds: float) -> float:
