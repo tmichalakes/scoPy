@@ -38,8 +38,4 @@ class RightAscension():
         longitude += 180 # convert longitude to be based on 360, 0 is the international date line
         
         return (longitude / 360.0) * (24 * 60 * 60)
-        
-    # Given the current 
-    def GetLocalTimeOffsetSeconds(self, longitude: float) -> float:
-        # TO-DO: This
-        return 0.0
+    
