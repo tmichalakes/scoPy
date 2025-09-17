@@ -1,7 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 EQUINOX_MONTH = 3
 EQUINOX_DAY = 21
+ONE_DAY = timedelta(days=1)
+MST_OFFSET_HOURS = -7.0
 
 class RightAscension():
     def __init__(self, hours: float, minutes: float, seconds: float):
@@ -30,12 +32,34 @@ class RightAscension():
 
         return (secondsSinceEquinox / totalYearSeconds) * 360
 
-    # provided a longitude (degrees), gives the exact solar time offset (in seconds) from UTC 0.0
-    def GetSolarTimeMidnightOffsetSeconds(self, longitude: float) -> float:
-        if longitude < -180.0 or longitude > 180.0:
-            raise ValueError("Longitude must be between -180.0 and 180.0")
-        
-        longitude += 180 # convert longitude to be based on 360, 0 is the international date line
-        
-        return (longitude / 360.0) * (24 * 60 * 60)
+    # Gets the current offset in degrees between
+    # TZ-midnight and solar midnight
+    def GetCurrentSolarOffsetDegrees(self, longitude: float, timezoneOffset: float) -> float:
+        tz = timezone(timezoneOffset)
+        currentTime = datetime.now(tz)
+        tomorrow = currentTime + ONE_DAY
+
+        totalSeconds = (tomorrow - currentTime).total_seconds()
+
+        midnight = datetime(currentTime.year, currentTime.month, currentTime.day, 0, 0, 0)
+        if(currentTime.hour > 12):
+            midnight += ONE_DAY
     
+        timeToMidnight = midnight - currentTime
+        solarTimeOffset = self.CurrentLocalSolarOffsetSeconds(longitude, timezoneOffset)
+
+        return (timeToMidnight - solarTimeOffset) * (360.0 / totalSeconds)
+
+    # gets the difference in seconds between
+    # the local time (based on time zone) and the solar time
+    # based on longitude
+    def CurrentLocalSolarOffsetSeconds(self, longitude: float, timezoneOffset: float) -> float:
+        currentTime = datetime.now(timezone.utc)
+        tomorrow = currentTime + ONE_DAY
+
+        totalSeconds = (tomorrow - currentTime).total_seconds()
+
+        timezone_seconds = (timezoneOffset / 24.0) * totalSeconds
+        solar_seconds = (longitude / 360.0) * totalSeconds
+
+        return timezone_seconds - solar_seconds

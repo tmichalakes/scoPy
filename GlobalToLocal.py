@@ -12,16 +12,6 @@ NORTH = np.array([0.0, 0.0, 1]) #z
 DEGREES_PER_RADIAN = 180.0 / np.pi
 RADIANS_PER_DEGREE = np.pi / 180.0
 
-# Converts a right ascension given in hours, minutes, and seconds purely to seconds.
-def RASeconds(hours: float, minutes: float, seconds: float) -> float:
-    return hours * 60 * 60 + minutes * 60 + seconds
-
-# Given a right ascension provided in seconds, returns an angle from the up vector in the up-east plane
-# Do not need to convert declination to degrees - it's in degrees.
-def RAToTheta(seconds: float) -> float:
-    # TO-DO: this and other conversions to get angles from RA and time and date. 
-    return 0.0
-
 # Given a right ascension (in degrees from the zenith) and a declination (in degrees), returns 
 # a vector within the ambient basis.
 def SphericalToCartesian(rightAscensionDegrees: float, declination: float) -> np.ndarray:
