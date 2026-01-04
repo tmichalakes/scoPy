@@ -32,7 +32,7 @@ def SphericalToCartesian(rightAscensionDegrees: float, declination: float) -> np
 
 # GetBasis for local right ascension
 def GetBasisForLocalRightAscension(rightAscensionAngle: float) -> float:
-    if rightAscensionAngle < -180 or rightAscensionAngle < 180:
+    if rightAscensionAngle < -180 or rightAscensionAngle > 180:
         raise ValueError("Right Ascension Angle must be between -180 and 180")
     
     ra_radians = rightAscensionAngle * RADIANS_PER_DEGREE
@@ -59,17 +59,34 @@ def GetBasisForLatitude(latitude: float) -> tuple[np.ndarray, np.ndarray, np.nda
     return (upLocal, eastLocal, northLocal)
 
 # Provided a vector and a basis of orthonormal vectors, converts the vector to the coordinate system defined by the matrix
-def BasisChange(vector: np.ndarray, basis: tuple[np.ndarray, np.ndarray, np.ndarray]) -> np.ndarray:
+def BasisChange(vector: np.ndarray, *basis_vectors: np.ndarray) -> np.ndarray:
+    """
+    Given an ambient vector `vector` and a variable list of basis vectors (each a 1-D array length 3),
+    return the coordinates of `vector` in that basis. Basis vectors are interpreted as rows, so
+    result = A @ vector where A[i,:] = basis_vector_i. Returns a 1-D ndarray of shape (3,) (or (n,) when
+    n basis vectors provided).
+    """
     if vector is None:
         raise ValueError("You must provide a vector")
-    
-    if basis is None:
-        raise ValueError("You must provide a basis")
 
-    # np.matrix is "row-first" - that is, given [[1,2], [3,4]], 1,2 will be the first row of the matrix
-    baseChangeMatrix = np.matrix(basis)
+    if not basis_vectors:
+        raise ValueError("You must provide at least one basis vector")
 
-    return baseChangeMatrix * vector
+    # Ensure vector is a 1-D ndarray
+    vec = np.asarray(vector).reshape(-1,)
+
+    # Stack basis vectors as rows (each row is a basis vector expressed in ambient coords)
+    try:
+        A = np.vstack([np.asarray(b).reshape(-1,) for b in basis_vectors])
+    except Exception as e:
+        raise ValueError("Basis vectors must be array-like and match vector length") from e
+
+    if A.shape[1] != vec.shape[0]:
+        raise ValueError(f"Basis vectors length ({A.shape[1]}) must match vector length ({vec.shape[0]})")
+
+    # Compute coordinates; result is a 1-D ndarray of length equal to number of basis vectors
+    coords = A @ vec
+    return coords
 
 # Given a local vector and a local basis, gives the heading unit vector in the east-north plane
 def GetHeadingVector(localVector: np.ndarray, localBasis: tuple[np.ndarray, np.ndarray, np.ndarray]) -> np.ndarray:
