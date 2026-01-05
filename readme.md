@@ -1,4 +1,5 @@
 # scoPy
 Python project for pointing my telescope.
 
-Everything is custom, so you have fun now, ya hear?
+## Install Dependencies:
+Run `pip install -r requirements.txt`
