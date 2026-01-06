@@ -1,4 +1,4 @@
-import numpy as np;
+import numpy as np
 
 # Library to convert Right Ascension and Declination to given coordinates given Latitude, Right Ascension, And Declination
 # All Coordinate systems are defined in terms of the orthonormal basis x=up, y=east, z=north where up is directly towards the zenith,
@@ -14,28 +14,55 @@ RADIANS_PER_DEGREE = np.pi / 180.0
 
 # Given a right ascension (in degrees from the zenith) and a declination (in degrees), returns 
 # a vector within the ambient basis.
-def SphericalToCartesian(rightAscensionDegrees: float, declination: float) -> np.ndarray:
-    if rightAscensionDegrees < 0 or rightAscensionDegrees > 360:
-        raise ValueError("Right Ascension degrees must be between 0 and 360")
-    
-    if declination < -90 or declination > 90:
-        raise ValueError("Declination must be between -90 and 90")
+def SphericalToCartesian(rho: float, theta: float, phi: float) -> np.ndarray:
+    """
+    Converts spherical coordinates to Cartesian coordinates in the ambient basis, using standard mathematical conventions.
 
-    ra_radians = rightAscensionDegrees * RADIANS_PER_DEGREE
-    dec_radians = declination * RADIANS_PER_DEGREE
+    Standard convention:
+    - theta (azimuthal): angle in degrees from the positive x-axis in the x-y plane, in [0, 360].
+    - phi (polar): angle in degrees from the positive z-axis down to the x-y plane, in [0, 180].
 
-    up = np.cos(ra_radians) * np.cos(dec_radians)
-    east = np.sin(ra_radians) * np.cos(dec_radians)
-    north = np.sin(dec_radians)
+    :param rho: Radius or magnitude
+    :type rho: float
+    :param theta: Azimuthal angle in degrees, measured from the positive x-axis in the x-y plane, must be in the range [0, 360].
+    :type theta: float
+    :param phi: Polar angle in degrees, measured from the positive z-axis, must be in the range [0, 180].
+    :type phi: float
+    :return: Returns a 1-D ndarray of shape (3,) representing the Cartesian coordinates.
+    :rtype: ndarray[_AnyShape, dtype[Any]]
+    """
+    if theta < 0 or theta > 360:
+        raise ValueError("Theta (azimuthal) degrees must be between 0 and 360")
+    if phi < 0 or phi > 180:
+        raise ValueError("Phi (polar) degrees must be between 0 and 180")
 
-    return up * UP + east * EAST + north * NORTH
+    theta_radians = theta * RADIANS_PER_DEGREE
+    phi_radians = phi * RADIANS_PER_DEGREE
+
+    # Standard convention:
+    # x = rho * sin(phi) * cos(theta)
+    # y = rho * sin(phi) * sin(theta)
+    # z = rho * cos(phi)
+    up = np.sin(phi_radians) * np.cos(theta_radians)
+    east = np.sin(phi_radians) * np.sin(theta_radians)
+    north = np.cos(phi_radians)
+
+    return rho * (up * UP + east * EAST + north * NORTH)
 
 # GetBasis for local right ascension
-def GetBasisForLocalRightAscension(rightAscensionAngle: float) -> float:
-    if rightAscensionAngle < -180 or rightAscensionAngle > 180:
+def GetBasisForLocalRightAscension(azimuthalAngle: float) -> float:
+    """
+    Docstring for GetBasisForLocalRightAscension
+    
+    :param azimuthalAngle: Description
+    :type azimuthalAngle: float
+    :return: Description
+    :rtype: float
+    """
+    if azimuthalAngle < -180 or azimuthalAngle > 180:
         raise ValueError("Right Ascension Angle must be between -180 and 180")
     
-    ra_radians = rightAscensionAngle * RADIANS_PER_DEGREE
+    ra_radians = azimuthalAngle * RADIANS_PER_DEGREE
     upLocal = np.cos(ra_radians) * UP + np.sin(ra_radians) * EAST
     eastLocal = -1 * np.sin(ra_radians) * UP + np.cos(ra_radians) * EAST
     northLocal = NORTH
@@ -106,6 +133,13 @@ def GetHeadingVector(localVector: np.ndarray, localBasis: tuple[np.ndarray, np.n
 
 # Given two vectors returns the angle between them in radians
 def AngleBetweenRadians(a: np.ndarray, b: np.ndarray) -> float:
+    """
+    Calculates the angle in radians between two vectors a and b.    
+    :type a: np.ndarray
+    :type b: np.ndarray
+    :return: The angle in radians between vectors a and b
+    :rtype: float
+    """
     dot = np.dot(a, b)
 
     mag_a = np.linalg.norm(a)
