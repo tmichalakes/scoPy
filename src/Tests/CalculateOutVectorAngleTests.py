@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timezone
-from RightAscension import CalculateOutVectorAngle
+from Astromath.RightAscension import CalculateOutVectorAngle
 
 class TestCalculateOutVectorAngle(unittest.TestCase):
     def assertAngleAlmostEqual(self, actual, expected, degreeTolerance=5.0):

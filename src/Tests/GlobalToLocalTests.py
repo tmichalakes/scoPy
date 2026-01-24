@@ -3,7 +3,7 @@ import numpy as np
 
 class TestGlobalToLocal(unittest.TestCase):
     def test_angle_between_radians(self):
-        from GlobalToLocal import AngleBetweenRadians
+        from Astromath.GlobalToLocal import AngleBetweenRadians
 
         # 0 degrees (same vector)
         a = np.array([1, 0, 0])
@@ -26,7 +26,7 @@ class TestGlobalToLocal(unittest.TestCase):
         self.assertAlmostEqual(AngleBetweenRadians(a, b), np.pi/3)
 
     def test_spherical_to_cartesian_cardinals(self):
-        from GlobalToLocal import SphericalToCartesian, UP, EAST, NORTH
+        from Astromath.GlobalToLocal import SphericalToCartesian, UP, EAST, NORTH
         
         # Origin
         np.testing.assert_array_almost_equal(

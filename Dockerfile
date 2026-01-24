@@ -16,4 +16,5 @@ COPY src/ ./src/
 ENV PYTHONPATH="/app/src"
 
 # Run tests with correct pattern
-CMD ["python", "-m", "unittest", "discover", "-s", "src/Tests", "-p", "*Tests.py"]
+WORKDIR /app/src
+CMD ["python", "-m", "unittest", "discover", "-s", "Tests", "-p", "*Tests.py"]
