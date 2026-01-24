@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  scopypy-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: scopypy-test
+    container_name: scopypy-test
+    command: []
+    # Remove the container after exit
+    restart: "no"
+    tty: false
+    stdin_open: false
